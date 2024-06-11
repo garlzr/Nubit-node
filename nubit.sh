@@ -1,24 +1,51 @@
 #!/bin/bash
 
-# 检查 screen 是否安装
-if ! command -v screen &> /dev/null
-then
-    echo "screen 未安装，正在安装..."
-    # 检查操作系统类型
-    if [ -x "$(command -v apt-get)" ]; then
-        sudo apt-get update
-        sudo apt-get install screen -y
-    elif [ -x "$(command -v yum)" ]; then
-        sudo yum install screen -y
-    else
-        echo "无法识别的包管理器，请手动安装 screen"
-        exit 1
-    fi
-else
-    echo "screen 已安装"
+# 检查是否以root用户运行脚本
+if [ "$(id -u)" != "0" ]; then
+    echo "此脚本需要以root用户权限运行。"
+    echo "请尝试使用 'sudo -i' 命令切换到root用户，然后再次运行此脚本。"
+    exit 1
 fi
 
+# 脚本保存路径
+SCRIPT_PATH="$HOME/nubit.sh"
+
 function install_node() {
+    # 检查 screen 是否安装
+    if ! command -v screen &> /dev/null
+    then
+        echo "screen 未安装，正在安装..."
+        # 检查操作系统类型
+        if [ -x "$(command -v apt-get)" ]; then
+            sudo apt-get update
+            sudo apt-get install screen -y
+        elif [ -x "$(command -v yum)" ]; then
+            sudo yum install screen -y
+        else
+            echo "无法识别的包管理器，请手动安装 screen"
+            exit 1
+        fi
+    else
+        echo "screen 已安装"
+    fi
+        # 检查 curl 是否安装
+    if ! command -v curl &> /dev/null
+    then
+        echo "curl 未安装，正在安装..."
+        # 检查操作系统类型
+        if [ -x "$(command -v apt-get)" ]; then
+            sudo apt-get update
+            sudo apt-get install curl -y
+        elif [ -x "$(command -v yum)" ]; then
+            sudo yum install curl -y
+        else
+            echo "无法识别的包管理器，请手动安装 curl"
+            exit 1
+        fi
+    else
+        echo "curl 已安装"
+    fi
+    
     cd $HOME
     screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
     screen -dmS nubit bash -c 'curl -sL https://nubit.sh | bash'

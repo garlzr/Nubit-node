@@ -91,7 +91,6 @@ function check_service_status() {
 # 主菜单
 function main_menu() {
     clear
-    echo "==========================自用脚本=============================="
     echo "请选择要执行的操作:"
     echo "1. 安装节点"
     echo "2. 查看节点日志"

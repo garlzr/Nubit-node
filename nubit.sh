@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# 检查 screen 是否安装
+if ! command -v screen &> /dev/null
+then
+    echo "screen 未安装，正在安装..."
+    # 检查操作系统类型
+    if [ -x "$(command -v apt-get)" ]; then
+        sudo apt-get update
+        sudo apt-get install screen -y
+    elif [ -x "$(command -v yum)" ]; then
+        sudo yum install screen -y
+    else
+        echo "无法识别的包管理器，请手动安装 screen"
+        exit 1
+    fi
+else
+    echo "screen 已安装"
+fi
+
+
+function install_node(){
+cd $HOME
+screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
+screen -S nubit
+curl -sL1 https://nubit.sh | bash
+}
+
+function restart(){
+screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
+screen -S nubit
+curl -sL1 https://nubit.sh | bash
+}
+
+function backup(){
+
+# 定义目标文件夹
+TARGET_DIR="/root/nubit_key"
+
+# 检查目标文件夹是否存在，如果不存在则创建它
+if [ ! -d "$TARGET_DIR" ]; then
+  mkdir -p "$TARGET_DIR"
+fi
+
+# 复制文件和文件夹到目标文件夹
+cp -r /root/.nubit-light-nubit-alphatestnet-1/keys "$TARGET_DIR"
+cp /root/nubit-node/mnemonic.txt "$TARGET_DIR"
+
+echo "钱包数据已成功拷贝到 $TARGET_DIR"
+}
+
+function uninstall(){
+rm -rf $HOME/nubit-node
+rm -rf $HOME/.nubit-light-nubit-alphatestnet-1
+
+}
+
+function check_service_status(){
+screen -r nubit
+}
+
+# 主菜单
+function main_menu() {
+    clear
+    echo "==========================自用脚本=============================="
+    echo "请选择要执行的操作:"
+    echo "1. 安装节点"
+    echo "2. 查看节点日志"
+    echo "3. 重启节点"
+    echo "4. 备份节点钱包数据"
+    echo "5. 卸载节点"
+    read -p "请输入选项（1-5）: " OPTION
+
+    case $OPTION in
+    1) install_node ;;
+    2) check_service_status ;;
+    3) restart ;;
+    4) backup ;;
+    5) uninstall ;;
+    *) echo "无效选项。" ;;
+    esac
+}
+
+# 显示主菜单
+main_menu
+
+

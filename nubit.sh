@@ -49,7 +49,7 @@ function install_node() {
     cd $HOME
     screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
     screen -dmS nubit bash -c 'curl -sL https://nubit.sh | bash'
-    echo "节点安装完成，请使用 'screen -r nubit' 查看日志。"
+    screen -r nubit
 }
 
 function restart() {

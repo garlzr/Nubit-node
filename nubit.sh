@@ -18,45 +18,47 @@ else
     echo "screen 已安装"
 fi
 
-
-function install_node(){
-cd $HOME
-screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
-screen -S nubit
-curl -sL1 https://nubit.sh | bash
+function install_node() {
+    cd $HOME
+    screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
+    screen -dmS nubit bash -c 'curl -sL https://nubit.sh | bash'
+    echo "节点安装完成，请使用 'screen -r nubit' 查看日志。"
 }
 
-function restart(){
-screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
-screen -S nubit
-curl -sL1 https://nubit.sh | bash
+function restart() {
+    screen -ls | grep Detached | grep nubit | awk -F '[.]' '{print $1}' | xargs -I {} screen -S {} -X quit
+    screen -dmS nubit bash -c 'curl -sL https://nubit.sh | bash'
+    echo "节点已重启，请使用 'screen -r nubit' 查看日志。"
 }
 
-function backup(){
+function backup() {
+    # 定义目标文件夹
+    TARGET_DIR="/root/nubit_key"
 
-# 定义目标文件夹
-TARGET_DIR="/root/nubit_key"
+    # 检查目标文件夹是否存在，如果不存在则创建它
+    if [ ! -d "$TARGET_DIR" ]; then
+        mkdir -p "$TARGET_DIR"
+    fi
 
-# 检查目标文件夹是否存在，如果不存在则创建它
-if [ ! -d "$TARGET_DIR" ]; then
-  mkdir -p "$TARGET_DIR"
-fi
+    # 复制文件和文件夹到目标文件夹
+    cp -r /root/.nubit-light-nubit-alphatestnet-1/keys "$TARGET_DIR"
+    cp /root/nubit-node/mnemonic.txt "$TARGET_DIR"
 
-# 复制文件和文件夹到目标文件夹
-cp -r /root/.nubit-light-nubit-alphatestnet-1/keys "$TARGET_DIR"
-cp /root/nubit-node/mnemonic.txt "$TARGET_DIR"
-
-echo "钱包数据已成功拷贝到 $TARGET_DIR"
+    echo "钱包数据已成功拷贝到 $TARGET_DIR"
 }
 
-function uninstall(){
-rm -rf $HOME/nubit-node
-rm -rf $HOME/.nubit-light-nubit-alphatestnet-1
-
+function uninstall() {
+    rm -rf $HOME/nubit-node
+    rm -rf $HOME/.nubit-light-nubit-alphatestnet-1
+    echo "节点已卸载。"
 }
 
-function check_service_status(){
-screen -r nubit
+function check_service_status() {
+    if screen -list | grep -q "nubit"; then
+        screen -r nubit
+    else
+        echo "没有运行中的 nubit 节点。"
+    fi
 }
 
 # 主菜单
@@ -77,11 +79,13 @@ function main_menu() {
     3) restart ;;
     4) backup ;;
     5) uninstall ;;
-    *) echo "无效选项。" ;;
+    *) 
+        echo "无效选项。" 
+        read -p "按任意键返回主菜单..."
+        main_menu
+        ;;
     esac
 }
 
 # 显示主菜单
 main_menu
-
-

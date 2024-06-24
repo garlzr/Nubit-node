@@ -73,7 +73,9 @@ function backup() {
     # 复制文件和文件夹到目标文件夹
     cp -r /root/.nubit-light-nubit-alphatestnet-1/keys "$TARGET_DIR"
     cp /root/nubit-node/mnemonic.txt "$TARGET_DIR"
-
+    # 复制文件和文件夹到目标文件夹
+    cp -r /root/.nubit-light-nubit-alphatestnet-1/keys/. "$TARGET_DIR/keys"
+    cp /root/nubit-node/mnemonic.txt "$TARGET_DIR"
     echo "钱包数据已成功拷贝到 $TARGET_DIR"
 }
 

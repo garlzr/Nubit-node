@@ -34,7 +34,7 @@ function install_node() {
     
         # Create the start script
         echo "Extracting $FILE_NAME..."
-        cat << EOF > start_dekube.sh
+cat << EOF > start_dekube.sh
 #!/bin/bash
 nohup dekube start > output.log 2>&1 &
 sleep 3
